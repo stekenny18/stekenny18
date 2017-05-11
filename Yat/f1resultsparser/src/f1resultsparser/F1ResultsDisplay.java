@@ -9,26 +9,31 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 
 public class F1ResultsDisplay {
-	static String url = "http://www.f1-fansite.com/f1-results/2015-f1-results-standings/";
-	static String path = "src/f1resultsparser/2015F1.html";
-	Document doc;
+	String url;
+	String path;
+	private static final Logger LOGGER = Logger.getLogger( F1ResultsDisplay.class.getName() );
 	
 	F1ResultsDisplay() {
+		url = "http://www.f1-fansite.com/f1-results/2015-f1-results-standings/";
+		path = "src/f1resultsparser/2015F1.html";
 		
 	}
 	
 	Document parseHTML() throws IOException {
 		HTMLParser hParser = new HTMLParser();
-		return doc = hParser.loadFromFile(path);	
+		//return hParser.loadFromFile(path);	
+		return hParser.loadFromUrl(url);
 	}
 	
-	LinkedList<Driver> retrieveDrivers() {
-		LinkedList<Driver> drivers = new LinkedList<Driver>();
+	LinkedList<Driver> retrieveDrivers(Document doc) {
+		LinkedList<Driver> drivers = new LinkedList<>();
 		Element table = doc.select("table[class=motor-sport-results msr_season_driver_results]").first();
 		
 		Iterator<Element> driverIter = table.select("td[class=msr_driver]").iterator();
@@ -45,8 +50,8 @@ public class F1ResultsDisplay {
 		
 	}
 	
-	LinkedList<Team> retrieveTeams() {
-		LinkedList<Team> teams = new LinkedList<Team>();
+	LinkedList<Team> retrieveTeams(Document doc) {
+		LinkedList<Team> teams = new LinkedList<>();
 		Element table = doc.select("table[class=motor-sport-results msr_season_team_results]").first();
 		Element tbody = table.select("tbody").first();
 		Iterator<Element> teamIter = tbody.select("td[class=msr_team]").iterator();
@@ -76,18 +81,35 @@ public class F1ResultsDisplay {
 
 	}
 	
-	String getTopNDrivers(int n) {
-		List<Driver> topN = retrieveDrivers().subList(0,n+1);
-		return driversToJson(topN);
+	String getTopNDrivers(LinkedList<Driver> all, int n) {
+		try {
+			List<Driver> topN = all.subList(0,n+1);
+			return driversToJson(topN);
+		}
+		catch(IndexOutOfBoundsException e) {
+			LOGGER.info("Error: There are less than " + n + "results!");
+			LOGGER.info(e.toString()); 
+			LOGGER.info("Returning all " + all.size() + " results instead.");
+			return driversToJson(all);
+		}
 		
 	}
 	
-	String getTopNTeams(int n) {
-		List<Team> topN = retrieveTeams().subList(0,n+1);
-		return teamsToJson(topN);
+	String getTopNTeams(LinkedList<Team> all,int n) {
+		try {
+			List<Team> topN = all.subList(0,n+1);
+			return teamsToJson(topN);
+		}
+		
+		catch(IndexOutOfBoundsException e) {
+			LOGGER.info("Error: There are less than " + n + "results!");
+			LOGGER.info(e.toString()); 
+			LOGGER.info("Returning all " + all.size() + " results instead.");
+			return teamsToJson(all);
+		}
 	}
 
-	void displayMenu() {
+	int displayMenu() {
 		System.out.println("2015 F1 Results To Json"
 				+ "\n====================="
 				+ "\nSelect a task:"
@@ -97,41 +119,54 @@ public class F1ResultsDisplay {
 		Scanner reader = new Scanner(System.in);
 		i = reader.nextInt();
 		while (i != 1 && i != 2 ) {
-			System.out.println("Invalid input. Please select an option (1 or 2).");
+			LOGGER.info("Invalid input. Please select an option (1 or 2).");
 			i = reader.nextInt();
 		}
 		reader.close();
-		getResults(i);	
+		return i;
 	}
 
-	void getResults(int i) {
+	String getResults(Document doc, int i) {
+		String json = "";
 		try {
-			parseHTML();
-			String json = "";
 			if (i==1) {
-				json = getTopNDrivers(10);
+				LinkedList<Driver> list = retrieveDrivers(doc);
+				json = getTopNDrivers(list, 10);
 			}
 			
 			else if (i==2) {
-				json = getTopNTeams(5);
+				LinkedList<Team> list = retrieveTeams(doc);
+				json = getTopNTeams(list, 5);
 			}
 			
-			System.out.println("Results: \n" + json);
+			else {
+				throw new IllegalArgumentException("Did not receive 1 or 2 as input");
+			}
+			
 			System.out.println("Writing to file...");
 			Path file = Paths.get("results.json");
 			Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
 			System.out.println("Results saved to results.json");
+			
+			return json;
 		}
 		
 		catch(IOException e) {
-			System.out.println("Error writing to file");
-			e.printStackTrace();
+			LOGGER.info("Error writing to file");
+			LOGGER.info(e.toString()); 
 		}
+		return json;
 	}
 	
 	public static void main(String[] args) throws IOException {
-		F1ResultsDisplay test = new F1ResultsDisplay();
-		test.displayMenu();
+		F1ResultsDisplay fRDisplay = new F1ResultsDisplay();
+		Document doc = fRDisplay.parseHTML();
+		int input = fRDisplay.displayMenu();
+		String json = fRDisplay.getResults(doc, input);
+		
+		System.out.println("json: " + json);
+		
+		
 	}
 }
 
