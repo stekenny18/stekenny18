@@ -60,7 +60,7 @@ public class HTMLParserTest {
     }
     
     @Test
-    public void selectFirstElementByNameFromDocValidTest() {
+    public void testSelectFirstElementByNameFromDocValid() {
         Document docTest = new Document("test doc");
         Element elementTest = docTest.appendElement("testName");
         
@@ -71,7 +71,7 @@ public class HTMLParserTest {
     }
     
     @Test(expected=IllegalArgumentException.class)
-    public void selectFirstElementByNameFromDocNullCaseTest() {
+    public void testSelectFirstElementByNameFromDocNullCase() {
         Document docTest = new Document("test doc");
         docTest.appendElement("testName");
         
@@ -79,7 +79,7 @@ public class HTMLParserTest {
         
     }
     @Test(expected=IllegalArgumentException.class)
-    public void selectFirstElementByNameFromDocEmptyCaseTest() {
+    public void testSelectFirstElementByNameFromDocEmptyCase() {
         Document docTest = new Document("test doc");
         docTest.appendElement("testName");
         
@@ -88,7 +88,7 @@ public class HTMLParserTest {
     }
     
     @Test
-    public void selectFirstElementByNameFromDocNotExistTest() {
+    public void testSelectFirstElementByNameFromDocNotExist() {
         Document docTest = new Document("test doc");
         docTest.appendElement("testName");
         
@@ -97,7 +97,7 @@ public class HTMLParserTest {
     }
     
     @Test
-    public void selectFirstElementByNameFromElementValidTest() {
+    public void testSelectFirstElementByNameFromElementValid() {
         Element eleTest = new Element("test ele");
         Element elementTest = eleTest.appendElement("testName");
         
@@ -108,7 +108,7 @@ public class HTMLParserTest {
     }
     
     @Test(expected=IllegalArgumentException.class)
-    public void selectFirstElementByNameFromElementNullCaseTest() {
+    public void testSelectFirstElementByNameFromElementNullCase() {
         Element eleTest = new Element("test ele");
         eleTest.appendElement("testName");
         
@@ -116,7 +116,7 @@ public class HTMLParserTest {
         
     }
     @Test(expected=IllegalArgumentException.class)
-    public void selectFirstElementByNameFromElementEmptyCaseTest() {
+    public void testSelectFirstElementByNameFromElementEmptyCase() {
         Element eleTest = new Element("test ele");
         eleTest.appendElement("testName");
         
@@ -125,7 +125,7 @@ public class HTMLParserTest {
     }
     
     @Test
-    public void selectFirstElementByNameFromElementNotExistTest() {
+    public void testSelectFirstElementByNameFromElementNotExist() {
         Element eleTest = new Element("test ele");
         eleTest.appendElement("testName");
         
