@@ -28,6 +28,9 @@ public class HTMLExtractor {
                 HTMLDoc = Jsoup.parse(input , "UTF-8");
                 results = new Results();
             }
+            else{
+                HTMLDoc = null;
+            }
         }
     }
     
@@ -89,5 +92,12 @@ public class HTMLExtractor {
      */
     public Results getResults(){
         return results;
+    }
+    
+    /**
+     * @return HTMLDoc as Document
+     */
+    public Document getHTMLDoc(){
+        return HTMLDoc;
     }
 }

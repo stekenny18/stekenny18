@@ -18,6 +18,7 @@ public class MainProcessor {
         String url = "resources/2015 F1 Results & Standings Schedule _ F1-Fansite.com.html";
         HTMLExtractor extractor = new HTMLExtractor(url);
         
+        if(extractor.getHTMLDoc() != null){
         extractor.extractXDrivers(10, "table.msr_season_driver_results");
         extractor.extractXTeams(5, "table.msr_season_team_results");
         
@@ -25,5 +26,8 @@ public class MainProcessor {
         JSONConverter jsonFormat = new JSONConverter(extractor.getResults());
         System.out.println(jsonFormat.createJsonDrivers());
         System.out.println(jsonFormat.createJsonTeams());
+        }else{
+            System.out.println("HTMLDOC not found");
+        }
     }
 }
