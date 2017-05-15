@@ -9,7 +9,7 @@ import org.jsoup.nodes.Element;
 import org.junit.Before;
 import org.junit.Test;
 
-import f1resultsparser.HTMLParser;
+import f1resultsparser.Controller.HTMLParser;
 
 public class HTMLParserTest {
     HTMLParser hParserModeFile;
