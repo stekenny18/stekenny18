@@ -3,6 +3,8 @@ package graduate_training_CD;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,10 +19,11 @@ public class JSONConverterTest {
     private String url = "resources/2015 F1 Results & Standings Schedule _ F1-Fansite.com.html";
     private HTMLExtractor extractor;
     private JSONConverter jsonFormat;
+    private List<TeamAndDriverSuper> teamOrDriverList;
     
     /**
-     * @throws IOException for parsing a html document in HTMLExtractor
-     * sets up htmlExtractor before each test case
+     * Sets up htmlExtractor before each test case.
+     * @throws IOException for parsing a html document in HTMLExtractor.
      */
     @Before
     public void setUp() throws IOException{
@@ -28,55 +31,37 @@ public class JSONConverterTest {
     }
     
     /**
-     * tests null list for drivers for json parsing
+     * Tests null list for team for json parsing.
      */
     @Test
-    public void passNullDriversListTest(){
-        jsonFormat = new JSONConverter(null);
-        assertEquals("should return null", null, jsonFormat.createJsonDrivers());
+    public void passNullListTest(){
+        jsonFormat = new JSONConverter();
+        assertEquals("should return null", null, jsonFormat.createJsonDriversOrTeam(new ArrayList<TeamAndDriverSuper>()));
     }
     
     /**
-     * tests null list for team for json parsing
+     * Tests empty list for json parsing.
      */
     @Test
-    public void passNullTeamListTest(){
-        jsonFormat = new JSONConverter(null);
-        assertEquals("should return null", null, jsonFormat.createJsonTeams());
+    public void passEmptyListTest(){
+        jsonFormat = new JSONConverter();
+        assertEquals("should return empty json", null, jsonFormat.createJsonDriversOrTeam(null));
     }
     
     /**
-     * tests empty driver list for json parsing
-     */
-    @Test
-    public void passEmptyDriverListTest(){
-        jsonFormat = new JSONConverter(new Results());
-        assertEquals("should return empty json", null, jsonFormat.createJsonDrivers());
-    }
-    
-    /**
-     * tests empty team list for json parsing
-     */
-    @Test
-    public void passEmptyTeamListTest(){
-        jsonFormat = new JSONConverter(new Results());
-        assertEquals("should return empty json", null, jsonFormat.createJsonTeams());
-    }
-    
-    /**
-     * tests if returned String is of Json array format for drivers list
+     * Tests if returned String is of Json array format for drivers list.
      */
     @Test
     public void parseToJSONDriversTest(){
         int driversAmount = 10;
-        extractor.extractXDrivers(driversAmount, "table.msr_season_driver_results");
+        teamOrDriverList = extractor.extractXDriversOrTeams(10, "table.msr_season_driver_results", "td.msr_driver");
         
         int jsonArraySize;
         boolean jsonArrayTrue = false;
-        jsonFormat = new JSONConverter(extractor.getResults());
+        jsonFormat = new JSONConverter();
         
         try {
-            jsonArraySize = new JSONArray(jsonFormat.createJsonDrivers()).length();
+            jsonArraySize = new JSONArray(jsonFormat.createJsonDriversOrTeam(teamOrDriverList)).length();
             jsonArrayTrue = true;
         } catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -90,28 +75,18 @@ public class JSONConverterTest {
     }
     
     /**
-     * tests if returned string is of json array format 
+     * Tests if returned string is of json array format. 
      */
     @Test
-    public void parseToJSONTeamTest(){
-        int teamAmount = 8;
-        extractor.extractXTeams(teamAmount, "table.msr_season_team_results");
-        
-        int jsonArraySize;
+    public void parseToJSONTest(){
+        int requestAmount = 1;
+        String expectedJsonFormatString = "[{\"Position\":1,\"Name\":\"Mercedes\",\"Points\":703}]";
         boolean jsonArrayTrue = false;
-        jsonFormat = new JSONConverter(extractor.getResults());
         
-        try {
-            jsonArraySize = new JSONArray(jsonFormat.createJsonTeams()).length();
-            jsonArrayTrue = true;
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            System.out.println(e.getMessage());
-            jsonArraySize = 0;
-            }
-            
-        assertTrue("returned string should be of json array format", jsonArrayTrue);
-        assertEquals("JSON array length should be size of requested drivers amount", teamAmount ,jsonArraySize);
+        teamOrDriverList = extractor.extractXDriversOrTeams(requestAmount, "table.msr_season_team_results", "td.msr_team");
+        jsonFormat = new JSONConverter();
+        
+        assertEquals("JSON array length should be size of requested drivers amount", expectedJsonFormatString ,jsonFormat.createJsonDriversOrTeam(teamOrDriverList));
         
     }
     

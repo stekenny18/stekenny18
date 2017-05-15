@@ -1,6 +1,8 @@
 package graduate_training_CD;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Callum Degriffa
@@ -17,15 +19,17 @@ public class MainProcessor {
     public static void main(String [] args) throws IOException{
         String url = "resources/2015 F1 Results & Standings Schedule _ F1-Fansite.com.html";
         HTMLExtractor extractor = new HTMLExtractor(url);
-        
+        List<TeamAndDriverSuper> teamOrDriverList;
         if(extractor.getHTMLDoc() != null){
-        extractor.extractXDrivers(10, "table.msr_season_driver_results");
-        extractor.extractXTeams(5, "table.msr_season_team_results");
-        
+            JSONConverter jsonFormat = new JSONConverter();
+            teamOrDriverList = extractor.extractXDriversOrTeams(10, "table.msr_season_driver_results", "td.msr_driver");
+            System.out.println(jsonFormat.createJsonDriversOrTeam(teamOrDriverList));
+            teamOrDriverList = extractor.extractXDriversOrTeams(1, "table.msr_season_team_results", "td.msr_team");
+            System.out.println(jsonFormat.createJsonDriversOrTeam(teamOrDriverList));
         System.out.println("json: ");
-        JSONConverter jsonFormat = new JSONConverter(extractor.getResults());
-        System.out.println(jsonFormat.createJsonDrivers());
-        System.out.println(jsonFormat.createJsonTeams());
+        
+        
+        
         }else{
             System.out.println("HTMLDOC not found");
         }

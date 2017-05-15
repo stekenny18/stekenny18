@@ -29,9 +29,9 @@ public class HTMLExtractorTest {
     @Test
     public void driverListSizeTest(){
         int listSize = 22;
-        extractor.extractXDrivers(listSize, "table.msr_season_driver_results");
+        
 
-        assertEquals("expected results = " + listSize, listSize, extractor.getResults().getDrivers().size());
+        assertEquals("expected results = " + listSize, listSize, extractor.extractXDriversOrTeams(listSize, "table.msr_season_driver_results", "td.msr_driver").size());
 
     }
 
@@ -41,9 +41,9 @@ public class HTMLExtractorTest {
     @Test
     public void teamListSizeTest(){
         int listSize = 5;
-        extractor.extractXTeams(listSize, "table.msr_season_team_results");
+        
 
-        assertEquals("expected results = " + listSize, listSize, extractor.getResults().getTeams().size());
+        assertEquals("expected results = " + listSize, listSize, extractor.extractXDriversOrTeams(listSize, "table.msr_season_team_results", "td.msr_team").size());
     }
 
     /**
@@ -53,10 +53,11 @@ public class HTMLExtractorTest {
     @Test
     public void driverListTooLargeTest(){
         int tooBigListSize = 26;
+        extractor.setElement("table.msr_season_driver_results");
+        int expectedListSize = extractor.getElement().select("td.msr_driver").size();
+        
 
-        extractor.extractXDrivers(tooBigListSize, "table.msr_season_driver_results");
-
-        assertEquals("should default to the size of table", extractor.getElement().select("td.msr_driver").size(), extractor.getResults().getDrivers().size());
+        assertEquals("should default to the size of table", expectedListSize, extractor.extractXDriversOrTeams(tooBigListSize, "table.msr_season_driver_results", "td.msr_driver" ).size());
 
     }
 
@@ -68,9 +69,10 @@ public class HTMLExtractorTest {
     public void teamListTooLargeTest(){
         int tooBigListSize = 15;
 
-        extractor.extractXTeams(tooBigListSize, "table.msr_season_team_results");
+        int expectedResult = extractor.extractXDriversOrTeams(tooBigListSize, "table.msr_season_team_results", "td.msr_team").size();
 
-        assertEquals("expected results = " + extractor.getElement().select("td.msr_team").size(),  extractor.getElement().select("td.msr_team").size(), extractor.getResults().getTeams().size());
+        assertEquals("expected results = " + expectedResult, expectedResult,  extractor.extractXDriversOrTeams(tooBigListSize, "table.msr_season_team_results", "td.msr_team").size());
+        System.out.println("");
     }
     
     /**
