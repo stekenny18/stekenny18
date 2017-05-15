@@ -1,9 +1,12 @@
 /**
  * 
  */
-package f1resultsparser;
+package f1resultsparser.Controller;
 
 import java.io.IOException;
+
+import f1resultsparser.Model.Enums.Modes;
+import f1resultsparser.View.F1ResultsView;
 
 /**
  * Main class. 
@@ -27,12 +30,12 @@ public class F1ParserController {
         view.displayModeMenu();
         int modeInt = view.receiveInput();
         
-        if (modeInt == 1) {
+        if (modeInt == Modes.FROMFILE.ordinal()) {
             mode = "file";
             location = path;
         }
         
-        if (modeInt == 2) {
+        if (modeInt == Modes.FROMURL.ordinal()) {
             mode = "url";
             location = url;
         }
