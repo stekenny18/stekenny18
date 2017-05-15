@@ -1,4 +1,4 @@
-package f1resultsparser;
+package f1resultsparser.Controller;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +13,12 @@ import java.util.logging.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import f1resultsparser.Model.Driver;
+import f1resultsparser.Model.Team;
+import f1resultsparser.Model.Enums.Modes;
+import f1resultsparser.Model.Enums.Tasks;
+import f1resultsparser.View.F1ResultsView;
+
 /**
  * Class specifically for the parsing of top drivers and teams from 2015 from F1 fansite.
  * @author Yat Cheung
@@ -20,9 +26,9 @@ import org.jsoup.nodes.Element;
  */
 
 public class F1Parser {
-    private HTMLParser hParser;
-    private JSONBuilder jb;
     private static final Logger LOGGER = Logger.getLogger( F1ResultsView.class.getName() );
+    private HTMLParser hParser;
+    private JSONBuilder jsonBuilder;
     
     
     /**
@@ -32,13 +38,13 @@ public class F1Parser {
      */
     public F1Parser(String location, String mode) {
         hParser = new HTMLParser(location, mode);
-        jb = new JSONBuilder();
+        jsonBuilder = new JSONBuilder();
     }
     
     /**
      * Executes relevant method to retrieve results depending on parameter input.
      * If parameter is 1, executes retrieveAllDrivers and retrieveTopNDrivers and  returns top 10 drivers as Json
-     * If paramater is 2, executes retireveAllTeams and retrieveTopNTeams and returns top 5 teams as Json
+     * If parameter is 2, executes retireveAllTeams and retrieveTopNTeams and returns top 5 teams as Json
      * Writes results to file "results.json"
      * @param i     int i denoting option selected. 1 = Top 10 drivers, 2 = Top 5 teams 
      * @return      String json of results, top 10 drivers or top 5 teams depending on option selected
@@ -47,33 +53,21 @@ public class F1Parser {
     public String returnResultsOfOption(int i) throws IOException {
         String json = "";
         Document doc = hParser.loadHTML();
-        try {
-            if (i==1) {
-                LinkedList<Driver> list = retrieveAllDrivers(doc);
-                json = retrieveTopNDrivers(list, 10);
-            }
-            
-            else if (i==2) {
-                LinkedList<Team> list = retrieveAllTeams(doc);
-                json = retrieveTopNTeams(list, 5);
-            }
-            
-            else {
-                throw new IllegalArgumentException("Did not receive 1 or 2 as input");
-            }
-            
-            System.out.println("Writing to file...");
-            Path file = Paths.get("results.json");
-            Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
-            System.out.println("Results saved to results.json");
-            
-            return json;
+        if ((i-1) == Tasks.DRIVERS.ordinal()) {
+            LinkedList<Driver> list = retrieveAllDrivers(doc);
+            json = retrieveTopNDrivers(list, 10);
+        } else if ((i-1) == Tasks.TEAMS.ordinal()) {
+            LinkedList<Team> list = retrieveAllTeams(doc);
+            json = retrieveTopNTeams(list, 5);
+        } else {
+            throw new IllegalArgumentException("Did not receive 1 or 2 as input");
         }
-        
-        catch(IOException e) {
-            LOGGER.info("Error writing to file");
-            LOGGER.info(e.getMessage()); 
-        }
+
+        System.out.println("Writing to file...");
+        Path file = Paths.get("results.json");
+        Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
+        System.out.println("Results saved to results.json");
+
         return json;
     }
     
@@ -138,18 +132,16 @@ public class F1Parser {
      */
     
     public String retrieveTopNDrivers(LinkedList<Driver> all, int n) {
-        try {
+        if (n > all.size()) {
+            LOGGER.info("There are less results than the " + n + " results requested!");
+            LOGGER.info("Returning all " + all.size() + " results instead.");
+            return driversToJson(all);
+        } else {
             List<Driver> topN = all.subList(0,n);
             return driversToJson(topN);
         }
-        catch(IndexOutOfBoundsException e) {
-            LOGGER.info("Error: There are less than " + n + "results!");
-            LOGGER.info(e.getMessage()); 
-            LOGGER.info("Returning all " + all.size() + " results instead.");
-            return driversToJson(all);
-        }
-        
     }
+
     
     /**
      * Method to retrieve top n teams in json form. Achieves this by passing in a LinkedList of all Teams and creating a sublist
@@ -160,16 +152,14 @@ public class F1Parser {
      * @return      a String of the top n teams in json format. 
      */
     public String retrieveTopNTeams(LinkedList<Team> all ,int n) {
-        try {
+        
+        if (n > all.size()) {
+            LOGGER.info((String.format("There are less results than the %d results requested!", n)));
+            LOGGER.info((String.format("Returning all %d results instead.", all.size())));
+            return teamsToJson(all);
+        } else {
             List<Team> topN = all.subList(0,n);
             return teamsToJson(topN);
-        }
-        
-        catch(IndexOutOfBoundsException e) {
-            LOGGER.info("Error: There are less than " + n + "results!");
-            LOGGER.info(e.getMessage()); 
-            LOGGER.info("Returning all " + all.size() + " results instead.");
-            return teamsToJson(all);
         }
     }
     
@@ -179,7 +169,7 @@ public class F1Parser {
      * @return          json String of all Driver objects in provided List
      */
     public String driversToJson(List<Driver> list) {
-        return jb.buildJson(list);
+        return jsonBuilder.buildJson(list);
 
     }
     
@@ -189,6 +179,6 @@ public class F1Parser {
      * @return          json String of all Team objects in provided List
      */
     public String teamsToJson(List<Team> list) {
-        return jb.buildJson(list);
+        return jsonBuilder.buildJson(list);
     }
 }
