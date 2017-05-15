@@ -1,4 +1,4 @@
-package f1resultsparser;
+package f1resultsparser.Model;
 
 /**
  * Simple class for storing Driver data. Data includes name and total points earned.

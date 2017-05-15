@@ -1,4 +1,4 @@
-package f1resultsparser;
+package f1resultsparser.View;
 
 import java.util.Scanner;
 import java.util.logging.Logger;
