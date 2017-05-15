@@ -4,15 +4,18 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class F1ParserTest {
+import f1resultsparser.Controller.F1Parser;
 
-//    @setupBefore
-//    public void testF1Parser() {
-//        
-//    }
+public class F1ParserTest {
+    private F1Parser fParser;
+    
+    @setupBefore
+    public void testF1Parser() {
+        
+    }
 
     @Test
-    public void testReturnResultsOfOption() {
+    public void testReturnResultsOfOptionValid() {
         fail("Not yet implemented");
     }
 

@@ -1,4 +1,4 @@
-package f1resultsparser;
+package f1resultsparser.Controller;
 
 import java.util.List;
 import com.google.gson.Gson;

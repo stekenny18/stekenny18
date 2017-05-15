@@ -1,4 +1,4 @@
-package f1resultsparser;
+package f1resultsparser.Controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +18,8 @@ import org.jsoup.nodes.Element;
  */
 
 public class HTMLParser {
+    public static final String fileString = "file";
+    public static final String urlString = "url";
     public Document doc;
     private String location;
     private String mode;
@@ -42,11 +44,11 @@ public class HTMLParser {
 	public Document loadHTML() throws IOException
 	{
 
-	    if ("file".equals(mode)) {
+	    if (fileString.equals(mode)) {
 	        doc = loadFromFile(location);
 	    }
 
-	    if ("url".equals(mode)) {
+	    if (urlString.equals(mode)) {
 	        doc = loadFromUrl(location);
 	    }
 
@@ -89,16 +91,17 @@ public class HTMLParser {
 	    return from.select(elementName).first();
 	}
 	
-	public Element selectFirstElementByName(String elementName, Element from) throws IllegalArgumentException {
-        return from.select(elementName).first();
-    }
-	
-	/**
+	   /**
      * Method to select an Element from an Element by name and return it.
      * @param elementName   a String of the name of the Element being looked for
      * @param from          the Element in which we are looking for the Element
      * @return              the first Element encountered in the Element with the provided name
      */
+    
+	
+	public Element selectFirstElementByName(String elementName, Element from) throws IllegalArgumentException {
+        return from.select(elementName).first();
+    }
 	
 	/**
 	 * Setter for class constructor
@@ -108,16 +111,17 @@ public class HTMLParser {
 	 */
 	private void setMode(String mode) throws IllegalArgumentException {
 
-	    if ("file".equals(mode) || "url".equals(mode)) {
+	    if (fileString.equals(mode) || urlString.equals(mode)) {
 	        this.mode = mode;
-	    }
-
-	    else {
+	    } else {
 	        throw new IllegalArgumentException();
 	    }
 	}
 
-	
+	/**
+	 * Setter for class constructor
+	 * @param location
+	 */
 	
 	private void setLocation(String location) {
 	    this.location = location;
