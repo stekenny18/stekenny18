@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import f1resultsparser.Driver;
-import f1resultsparser.JSONBuilder;
+import f1resultsparser.Controller.JSONBuilder;
+import f1resultsparser.Model.Driver;
 
 public class JSONBuilderTest {
     private List<Driver> list; 
