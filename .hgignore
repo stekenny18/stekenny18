@@ -1,3 +1,4 @@
 subinclude:Yat/.hgignore
+subinclude:Matt/.hgignore
 .class
 .project
